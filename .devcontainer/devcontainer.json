@@ -1,0 +1,40 @@
+{
+  "name": "${localWorkspaceFolderBasename} (.NET 10 + MySQL)",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "vscode",
+
+  // Volume nommé pour les données MySQL. Son nom ne dépend que du dossier du projet :
+  // tout nouveau devcontainer (ou reconstruction) de ce projet retrouve les mêmes données.
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-mysql-data,target=/var/lib/mysql,type=volume"
+  ],
+
+  "containerEnv": {
+    "MYSQL_DATABASE": "${localWorkspaceFolderBasename}_db",
+    "MYSQL_USER": "app",
+    "MYSQL_PASSWORD": "Azerty123",
+    "MYSQL_ROOT_PASSWORD": "Azerty123"
+  },
+
+  // À chaque démarrage du conteneur : détecte si le volume contient déjà des données MySQL,
+  // les réutilise si c'est le cas, sinon initialise une nouvelle instance, puis démarre MySQL.
+  "postStartCommand": "bash .devcontainer/scripts/mysql-start.sh",
+
+  "forwardPorts": [3306],
+  "portsAttributes": {
+    "3306": { "label": "MySQL", "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "editorconfig.editorconfig",
+        "cweijan.vscode-database-client2",
+        "mhutchie.git-graph"
+      ]
+    }
+  }
+}

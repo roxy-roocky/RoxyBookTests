@@ -1,0 +1,13 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "host=localhost;user=app;password=Azerty123;database=<dbname_depends_of_workspace_name>"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "DataProtectionsKeyDir": "/path/to/dir"
+}
