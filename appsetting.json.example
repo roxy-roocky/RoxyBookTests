@@ -11,3 +11,4 @@
   "AllowedHosts": "*",
   "DataProtectionsKeyDir": "/path/to/dir"
 }
+

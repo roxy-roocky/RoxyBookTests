@@ -1,5 +1,8 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿
+@inject IHttpContextAccessor httpContextAccessor;
+
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="@(httpContextAccessor.HttpContext!.Request.Cookies[ThemeToggle.THEME_KEY] ?? "light")">
 
 <head>
     <meta charset="utf-8" />
@@ -7,6 +10,7 @@
     <base href="/" />
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap-icons.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["RoxyBookTests.styles.css"]" />
     <ImportMap />
@@ -19,6 +23,7 @@
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="@Assets["Components/Account/Shared/PasskeySubmit.razor.js"]" type="module"></script>
+    <script src="@Assets["lib/bootstrap/dist/js/bootstrap.bundle.js"]"></script>
 </body>
 
 </html>

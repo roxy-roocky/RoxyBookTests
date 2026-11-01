@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RoxyBookTests.Components;
 using RoxyBookTests.Components.Account;
 using RoxyBookTests.Data;
+using RoxyBookTests.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(builder.Configuration["DataProtectionsKeyDir"]!));
+
+builder.Services.AddScoped<LocalStorage>();
 
 var app = builder.Build();
 

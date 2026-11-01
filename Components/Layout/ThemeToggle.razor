@@ -1,0 +1,50 @@
+﻿@implements IAsyncDisposable;
+@inject IHttpContextAccessor _httpContextAccessor;
+@inject IJSRuntime _jsRuntime;
+
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        <i class="bi @(CurrentTheme is null || CurrentTheme == "light" ? "bi-brightness-high-fill" : "bi-moon-fill")"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><button class="dropdown-item" @onclick=@(() => OnSwitchTheme("dark"))><i class="bi bi-moon-fill"></i>&nbsp; Sombre</button></li>
+        <li><button class="dropdown-item" @onclick=@(() => OnSwitchTheme("light"))><i class="bi bi-brightness-high-fill"></i>&nbsp; Clair</button></li>
+    </ul>
+</li>
+
+@code {
+    public static readonly string THEME_KEY = "bs_theme";
+    [PersistentState] public string? CurrentTheme {get; set;}
+
+    private IJSObjectReference? _script;
+
+    protected override void OnInitialized()
+    {
+        var cookie =  _httpContextAccessor.HttpContext?.Request.Cookies[THEME_KEY];
+
+        if(!string.IsNullOrWhiteSpace(cookie) && string.IsNullOrWhiteSpace(CurrentTheme))
+        {
+            CurrentTheme = cookie == "dark" ? "dark" : "light";
+        }
+    }
+
+    protected async Task OnSwitchTheme(string theme)
+    {
+        CurrentTheme = theme;
+        _script ??= await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Layout/ThemeToggle.razor.js");
+        await _script.InvokeVoidAsync("setTheme", CurrentTheme, THEME_KEY);
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if(_script is not null) await _script.DisposeAsync();
+        }
+        catch(JSDisconnectedException) {}
+    }
+}
