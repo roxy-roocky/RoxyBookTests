@@ -9,9 +9,9 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Manage your passkeys</PageTitle>
+<PageTitle>Gestion de vos passkeys</PageTitle>
 
-<h3>Manage your passkeys</h3>
+<h3>Gestion de vos passkeys</h3>
 
 <StatusMessage />
 
@@ -22,8 +22,8 @@
             @foreach (var passkey in currentPasskeys)
             {
                 <tr>
-                    <td>@(passkey.Name ?? "Unnamed passkey")</td>
-                    <td>
+                    <td class="align-middle">@(passkey.Name ?? "Passkey sans nom")</td>
+                    <td width="120px">
                         @{
                             var credentialId = Base64Url.EncodeToString(passkey.CredentialId);
                         }
@@ -31,8 +31,8 @@
                             <AntiforgeryToken />
                             <div>
                                 <input type="hidden" name="CredentialId" value="@credentialId" />
-                                <button type="submit" name="Action" value="rename" class="btn btn-primary" title="Rename this passkey">Rename</button>
-                                <button type="submit" name="Action" value="delete" class="btn btn-danger" title="Remove this passkey from your account">Delete</button>
+                                <button type="submit" name="Action" value="rename" class="btn btn-primary" title="Renommer cette passkey"><i class="bi bi-pencil-square"></i></button>
+                                <button type="submit" name="Action" value="delete" class="btn btn-danger" title="Supprimer cette passkey"><i class="bi bi-trash-fill"></i></button>
                             </div>
                         </form>
                     </td>
@@ -50,11 +50,11 @@ else
     <AntiforgeryToken />
     @if (currentPasskeys is { Count: >= MaxPasskeyCount })
     {
-        <p class="text-danger">You have reached the maximum number of allowed passkeys. Please delete one before adding a new one.</p>
+        <p class="text-danger">Vous avez atteint le nombre maximal de passkeys pour ce compte. Veuillez en supprimer une pour en ajouter à nouveau.</p>
     }
     else
     {
-        <PasskeySubmit Operation="PasskeyOperation.Create" Name="Input" class="btn btn-primary">Add a new passkey</PasskeySubmit>
+        <PasskeySubmit Operation="PasskeyOperation.Create" Name="Input" class="btn btn-primary">Ajouter une passkey.</PasskeySubmit>
     }
 
 </form>
@@ -100,33 +100,33 @@ else
 
         if (!string.IsNullOrEmpty(Input.Error))
         {
-            RedirectManager.RedirectToCurrentPageWithStatus($"Error: {Input.Error}", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus($"Erreur: {Input.Error}", HttpContext);
             return;
         }
 
         if (string.IsNullOrEmpty(Input.CredentialJson))
         {
-            RedirectManager.RedirectToCurrentPageWithStatus("Error: The browser did not provide a passkey.", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus("Erreur: Le navigateur n'a pas fourni de passkey.", HttpContext);
             return;
         }
 
         if (currentPasskeys!.Count >= MaxPasskeyCount)
         {
-            RedirectManager.RedirectToCurrentPageWithStatus($"Error: You have reached the maximum number of allowed passkeys.", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus($"Erreur: Vous avez atteint le nombre maximal de passkeys pour ce compte.", HttpContext);
             return;
         }
 
         var attestationResult = await SignInManager.PerformPasskeyAttestationAsync(Input.CredentialJson);
         if (!attestationResult.Succeeded)
         {
-            RedirectManager.RedirectToCurrentPageWithStatus($"Error: Could not add the passkey: {attestationResult.Failure.Message}", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus($"Erreur: Impossible d'ajouter la passkey: {attestationResult.Failure.Message}", HttpContext);
             return;
         }
 
         var addPasskeyResult = await UserManager.AddOrUpdatePasskeyAsync(user, attestationResult.Passkey);
         if (!addPasskeyResult.Succeeded)
         {
-            RedirectManager.RedirectToCurrentPageWithStatus("Error: The passkey could not be added to your account.", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus("Erreur: La passkey ne peut pas être ajoutée à votre compte.", HttpContext);
             return;
         }
 
@@ -146,7 +146,7 @@ else
                 await DeletePasskey();
                 break;
             default:
-                RedirectManager.RedirectToCurrentPageWithStatus($"Error: Unknown action '{Action}'.", HttpContext);
+                RedirectManager.RedirectToCurrentPageWithStatus($"Erreur: Action inconnue '{Action}'.", HttpContext);
                 break;
         }
     }
@@ -166,17 +166,17 @@ else
         }
         catch (FormatException)
         {
-            RedirectManager.RedirectToCurrentPageWithStatus("Error: The specified passkey ID had an invalid format.", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus("Erreur: Le format de l'identifiant de cette passkey est invalide.", HttpContext);
             return;
         }
 
         var result = await UserManager.RemovePasskeyAsync(user, credentialId);
         if (!result.Succeeded)
         {
-            RedirectManager.RedirectToCurrentPageWithStatus("Error: The passkey could not be deleted.", HttpContext);
+            RedirectManager.RedirectToCurrentPageWithStatus("Erreur: La passkey ne peut pas être supprimée.", HttpContext);
             return;
         }
 
-        RedirectManager.RedirectToCurrentPageWithStatus("Passkey deleted successfully.", HttpContext);
+        RedirectManager.RedirectToCurrentPageWithStatus("Passkey supprimée avec succès.", HttpContext);
     }
 }

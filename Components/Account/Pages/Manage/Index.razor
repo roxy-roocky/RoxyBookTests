@@ -8,9 +8,9 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>Profil</PageTitle>
 
-<h3>Profile</h3>
+<h3>Votre profil</h3>
 <StatusMessage />
 
 <div class="row">
@@ -19,15 +19,19 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
-                <input type="text" value="@username" id="username" class="form-control" placeholder="Choose your username." disabled />
-                <label for="username" class="form-label">Username</label>
+                <input type="text" value="@username" id="username" class="form-control" placeholder="Votre nom d'utilisateur." disabled />
+                <label for="username" class="form-label">Nom d'utilisateur</label>
             </div>
             <div class="form-floating mb-3">
+                <input type="text" value="@roles" id="username" class="form-control" placeholder="Pas de rôle" disabled />
+                <label for="roles" class="form-label">Vos rôles</label>
+            </div>
+            @* <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.PhoneNumber" id="Input.PhoneNumber" class="form-control" placeholder="Enter your phone number" />
                 <label for="Input.PhoneNumber" class="form-label">Phone number</label>
                 <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Save</button> *@
         </EditForm>
     </div>
 </div>
@@ -35,6 +39,7 @@
 @code {
     private ApplicationUser? user;
     private string? username;
+    private string? roles;
     private string? phoneNumber;
 
     [CascadingParameter]
@@ -57,12 +62,14 @@
         username = await UserManager.GetUserNameAsync(user);
         phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
+        roles = string.Join(", ", await UserManager.GetRolesAsync(user));
+
         Input.PhoneNumber ??= phoneNumber;
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (user is null)
+        @* if (user is null)
         {
             RedirectManager.RedirectToInvalidUser(UserManager, HttpContext);
             return;
@@ -79,7 +86,7 @@
         }
 
         await SignInManager.RefreshSignInAsync(user);
-        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext); *@
     }
 
     private sealed class InputModel

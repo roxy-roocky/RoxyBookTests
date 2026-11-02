@@ -6,23 +6,25 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Personal Data</PageTitle>
+<PageTitle>Données personnelles</PageTitle>
 
 <StatusMessage />
-<h3>Personal Data</h3>
+<h3>Données personnelles</h3>
 
 <div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+    <div class="col-12">
+        <p>Votre compte comporte des données personnelles que vous nous avez fourni. Vous pouvez les consulter et les supprimer ici.</p>
         <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+            <strong>Supprimer ces données va entrainer la fermeture définitive de votre compte. Les commentaires et données saisies dans les tests ne sont pas concernées.</strong>
         </p>
+    </div>
+    <div class="col-12 d-flex">
         <form action="Account/Manage/DownloadPersonalData" method="post">
             <AntiforgeryToken />
-            <button class="btn btn-primary" type="submit">Download</button>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-box-arrow-in-down"></i>&nbsp; Télécharger</button>
         </form>
-        <p>
-            <a href="Account/Manage/DeletePersonalData" class="btn btn-danger">Delete</a>
+        <p class="ms-4">
+            <a href="Account/Manage/DeletePersonalData" class="btn btn-danger"><i class="bi bi-trash-fill"></i>&nbsp; Supprimer</a>
         </p>
     </div>
 </div>

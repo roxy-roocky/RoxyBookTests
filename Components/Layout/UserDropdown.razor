@@ -1,0 +1,71 @@
+﻿@implements IAsyncDisposable;
+
+@inject AuthenticationStateProvider _authState;
+@inject NavigationManager NavigationManager
+
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        <i class="bi bi-person-circle"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <AuthorizeView>
+            <Authorized>
+                <li class="nav-item">
+                    <NavLink class="dropdown-item" href="/Account/Manage">
+                        <i class="bi bi-person"></i>&nbsp; @_userName
+                    </NavLink>
+                </li>
+                <li class="dropdown-diviser"></li>
+                <li class="nav-item">
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                        <button type="submit" class="dropdown-item">
+                            <i class="bi bi-door-closed-fill"></i>&nbsp; Déconnexion
+                        </button>
+                    </form>
+                </li>
+            </Authorized>
+            <NotAuthorized>
+                <li class="nav-item">
+                   <NavLink class="dropdown-item" href="/Account/Login">
+                        <i class="bi bi-box-arrow-in-right"></i>&nbsp; Se connecter
+                   </NavLink>
+                </li>
+            </NotAuthorized>
+        </AuthorizeView>
+    </ul>
+</li>
+
+@code {
+    protected string? _userName { get; set; } 
+    protected string? _userId { get; set; }
+    protected string? _currentUrl{ get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+        NavigationManager.LocationChanged += OnLocationChange;
+
+        var state = await _authState.GetAuthenticationStateAsync();
+        if(state is not null && state.User.Identity is not null && state.User.Identity.IsAuthenticated)
+        {
+            _userName = state.User.Claims.First(p => p.Type.EndsWith("name")).Value;
+            _userId = state.User.Claims.First(p => p.Type.EndsWith("nameidentifier")).Value;
+        }
+    }
+
+    protected void OnLocationChange(object? sender, LocationChangedEventArgs e)
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        NavigationManager.LocationChanged -= OnLocationChange;
+    }
+}
